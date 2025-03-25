@@ -1,3 +1,6 @@
+import os
+from huggingface_hub import login
+os.system("pip install torch==2.4.0+cu124 torchaudio==2.4.0+cu124 --extra-index-url https://download.pytorch.org/whl/cu124")
 import gradio as gr
 from cached_path import cached_path
 import tempfile
@@ -11,11 +14,6 @@ from f5_tts.infer.utils_infer import (
     infer_process,
     save_spectrogram,
 )
-
-import os
-from huggingface_hub import login
-
-os.system("pip install torch==2.4.0+cu124 torchaudio==2.4.0+cu124 --extra-index-url https://download.pytorch.org/whl/cu124")
 
 # Lấy token từ secrets
 hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
