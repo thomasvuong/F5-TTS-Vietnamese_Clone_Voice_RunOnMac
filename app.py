@@ -42,6 +42,7 @@ model = load_model(
     vocab_file=str(cached_path("hf://hynt/F5-TTS-Vietnamese-100h/vocab.txt")),
 )
 
+@spaces.GPU
 def infer_tts(ref_audio_orig: str, gen_text: str, speed: float = 1.0, request: gr.Request = None):
 
     if not ref_audio_orig:
