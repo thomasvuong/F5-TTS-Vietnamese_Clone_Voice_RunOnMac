@@ -69,7 +69,7 @@ def infer_tts(ref_audio_orig: str, gen_text: str, speed: float = 1.0, request: g
 with gr.Blocks(theme=gr.themes.Soft()) as demo:
     gr.Markdown("""
     # 🎤 F5-TTS: Tổng hợp giọng nói Tiếng Việt.
-    # Mô hình được huấn luyện 350.000 steps với bộ dữ liệu khoảng 100h trên 1 GPU RTX 3090. 
+    # Mô hình được huấn luyện 350.000 steps với bộ dữ liệu khoảng 150h trên 1 GPU RTX 3090. 
     Nhập văn bản và tải lên một mẫu giọng để tạo âm thanh tự nhiên.
     """)
     
@@ -86,9 +86,9 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
     
     model_limitations = gr.Textbox(
         value="""1. Mô hình có thể hoạt động không tốt với các ký tự số, ngày tháng, ký tự đặc biệt, ... => cần bổ sung thêm một module text normalization (chuẩn hoá text).
-2. Nhịp điệu của một số audio có thể chưa được mạch lạc, giật cục.
+2. Nhịp điệu của một số audio có thể chưa được mạch lạc, giật cục => Gợi ý hãy chọn các audio mẫu đọc rõ ràng, không ngắt quãng quá nhiều, sẽ cải thiện được kết quả tổng hợp.
 3. Audio reference text sử dụng model whisper-large-v3-turbo nên sẽ có một vài trường hợp không nhận diện chính xác Tiếng Việt, dẫn đến kết quả tổng hợp giọng nói rất tệ.
-4. Checkpoint của mô hình hiện tại dừng lại ở khoảng step thứ 350.000, được huấn luyện với 100 giờ dữ liệu public.""", 
+4. Checkpoint của mô hình hiện tại dừng lại ở khoảng step thứ 350.000, được huấn luyện với 150 giờ dữ liệu public => Việc voice cloning cho các giọng ngoại lai có thể không được chính xác tuyệt đối.""", 
         label="❗ Hạn chế của mô hình",
         lines=4,
         interactive=False
