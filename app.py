@@ -55,7 +55,7 @@ def infer_tts(ref_audio_orig: str, gen_text: str, speed: float = 1.0, request: g
     try:
         ref_audio, ref_text = preprocess_ref_audio_text(ref_audio_orig, "")
         final_wave, final_sample_rate, spectrogram = infer_process(
-            ref_audio, ref_text, post_process(TTSnorm(gen_text)), model, vocoder, speed=speed
+            ref_audio, ref_text.lower(), post_process(TTSnorm(gen_text)).lower(), model, vocoder, speed=speed
         )
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_spectrogram:
             spectrogram_path = tmp_spectrogram.name
