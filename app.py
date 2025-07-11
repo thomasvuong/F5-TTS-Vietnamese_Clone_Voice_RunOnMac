@@ -90,7 +90,7 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
     model_limitations = gr.Textbox(
         value="""1. This model may not perform well with numerical characters, dates, special characters, etc. => A text normalization module is needed.
 2. The rhythm of some generated audios may be inconsistent or choppy => It is recommended to select clearly pronounced sample audios with minimal pauses for better synthesis quality.
-3. Default, reference audio text uses the whisper-large-v3-turbo model, which may not always accurately recognize Vietnamese, resulting in poor voice synthesis quality.
+3. Default, reference audio text uses the pho-whisper-medium model, which may not always accurately recognize Vietnamese, resulting in poor voice synthesis quality.
 4. Inference with overly long paragraphs may produce poor results.""", 
         label="❗ Model Limitations",
         lines=4,
