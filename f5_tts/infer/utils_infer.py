@@ -77,7 +77,7 @@ def chunk_text(text, max_chars=135):
     i = 0
     while i < len(sentences):
         if len(sentences[i].split()) < 4:
-            if i == 0:
+            if i == 0 and i + 1 < len(sentences):
                 # Ghép với câu sau
                 sentences[i + 1] = sentences[i] + ', ' + sentences[i + 1]
                 del sentences[i]
