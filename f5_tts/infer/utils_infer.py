@@ -82,10 +82,11 @@ def chunk_text(text, max_chars=135):
                 sentences[i + 1] = sentences[i] + ', ' + sentences[i + 1]
                 del sentences[i]
             else:
-                # Ghép với câu trước
-                sentences[i - 1] = sentences[i - 1] + ', ' + sentences[i]
-                del sentences[i]
-                i -= 1
+                if i - 1 >= 0:
+                    # Ghép với câu trước
+                    sentences[i - 1] = sentences[i - 1] + ', ' + sentences[i]
+                    del sentences[i]
+                    i -= 1
         else:
             i += 1
 
