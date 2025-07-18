@@ -72,7 +72,7 @@ def infer_tts(ref_audio_orig: str, gen_text: str, speed: float = 1.0, request: g
 with gr.Blocks(theme=gr.themes.Soft()) as demo:
     gr.Markdown("""
     # 🎤 F5-TTS: Vietnamese Text-to-Speech Synthesis.
-    # The model was trained with approximately 1000 hours of data on an RTX 3090 GPU. 
+    # The model was trained with approximately 1000 hours of data on a RTX 3090 GPU. 
     Enter text and upload a sample voice to generate natural speech.
     """)
     
