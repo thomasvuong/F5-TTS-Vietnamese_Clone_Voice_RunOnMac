@@ -19,6 +19,7 @@ import matplotlib.pylab as plt
 import numpy as np
 import torch
 import torchaudio
+import soundfile as sf
 import tqdm
 from huggingface_hub import snapshot_download, hf_hub_download
 from pydub import AudioSegment, silence
@@ -32,6 +33,30 @@ from f5_tts.model.utils import (
 )
 
 _ref_audio_cache = {}
+
+
+def load_audio_with_fallback(audio_path):
+    """
+    Load audio file with fallback support.
+    Tries torchaudio.load() first, falls back to soundfile if torchcodec fails.
+    """
+    try:
+        audio, sr = torchaudio.load(audio_path)
+        return audio, sr
+    except (ImportError, RuntimeError, OSError) as e:
+        # If torchcodec fails, fall back to soundfile
+        try:
+            audio_data, sr = sf.read(audio_path, always_2d=True)
+            audio = torch.from_numpy(audio_data.T).float()
+            if audio.dim() == 1:
+                audio = audio.unsqueeze(0)
+            return audio, sr
+        except Exception as sf_error:
+            raise RuntimeError(
+                f"Failed to load audio with both torchaudio and soundfile. "
+                f"torchaudio error: {e}, soundfile error: {sf_error}"
+            )
+
 
 device = (
     "cuda"
@@ -196,13 +221,37 @@ def transcribe(ref_audio, language=None):
     global asr_pipe
     if asr_pipe is None:
         initialize_asr_pipeline(device=device)
-    return asr_pipe(
-        ref_audio,
-        chunk_length_s=30,
-        batch_size=128,
-        generate_kwargs={"task": "transcribe", "language": language} if language else {"task": "transcribe"},
-        return_timestamps=False,
-    )["text"].strip()
+    # Preload audio to avoid torchcodec issues with transformers pipeline
+    try:
+        audio, sr = load_audio_with_fallback(ref_audio)
+        # Convert to numpy array and ensure mono/stereo format expected by pipeline
+        if audio.dim() > 1:
+            audio_np = audio.squeeze().cpu().numpy()
+        else:
+            audio_np = audio.cpu().numpy()
+        # If stereo, take first channel or convert to mono
+        if audio_np.ndim > 1:
+            audio_np = audio_np[0] if audio_np.shape[0] < audio_np.shape[1] else audio_np.mean(axis=0)
+        # Pass as dict with array and sampling_rate to avoid torchcodec
+        return asr_pipe(
+            {"raw": audio_np, "sampling_rate": sr},
+            chunk_length_s=30,
+            batch_size=128,
+            generate_kwargs={"task": "transcribe", "language": language} if language else {"task": "transcribe"},
+            return_timestamps=False,
+        )["text"].strip()
+    except Exception as e:
+        # Fallback: try passing file path directly (might work if FFmpeg fixed the issue)
+        try:
+            return asr_pipe(
+                ref_audio,
+                chunk_length_s=30,
+                batch_size=128,
+                generate_kwargs={"task": "transcribe", "language": language} if language else {"task": "transcribe"},
+                return_timestamps=False,
+            )["text"].strip()
+        except Exception as e2:
+            raise RuntimeError(f"Failed to transcribe audio. Primary error: {e}, Fallback error: {e2}")
 
 
 # load model checkpoint for inference
@@ -409,7 +458,7 @@ def infer_process(
     device=device,
 ):
     # Split the input text into batches
-    audio, sr = torchaudio.load(ref_audio)
+    audio, sr = load_audio_with_fallback(ref_audio)
     max_chars = int(len(ref_text.encode("utf-8")) / (audio.shape[-1] / sr) * (25 - audio.shape[-1] / sr))
     gen_text_batches = chunk_text(gen_text, max_chars=max_chars)
     for i, gen_text in enumerate(gen_text_batches):

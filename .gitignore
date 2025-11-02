@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+conda-meta/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.history/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Model files and cache (will be pushed separately)
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+*.onnx
+.cache/
+hf_cache/
+*.wav
+*.flac
+*.mp3
+*.ogg
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.png
+*.jpg
+*.jpeg
+
+# Gradio
+flagged/
+spaces/
+
+# Data and datasets
+data/
+datasets/
+*.csv
+*.json
+!config.json
+
